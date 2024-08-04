@@ -85,10 +85,10 @@ namespace KiriMeshSplitter
 
 		private void SplitByMaterials (SkinnedMeshRenderer mesh_renderer)
 		{
-			string submesh_dir = getSubmeshPath (mesh_renderer);
+			var submesh_dir = getSubmeshPath (mesh_renderer);
 			createFolder (submesh_dir);
 
-			for (int i = 0; i < mesh_renderer.sharedMesh.subMeshCount; i++) {
+			for (var i = 0; i < mesh_renderer.sharedMesh.subMeshCount; i++) {
 				splitSubmesh (mesh_renderer, i, submesh_dir);
 			}
 
@@ -97,8 +97,8 @@ namespace KiriMeshSplitter
 
 		private string getSubmeshPath (SkinnedMeshRenderer mesh_renderer)
 		{
-			string mesh_path = AssetDatabase.GetAssetPath (mesh_renderer.sharedMesh);
-			string base_dir = Path.GetDirectoryName (mesh_path);
+			var mesh_path = AssetDatabase.GetAssetPath (mesh_renderer.sharedMesh);
+			var base_dir = Path.GetDirectoryName (mesh_path);
 
 			if (base_dir.EndsWith ("Submeshes")) {
 				return base_dir;
@@ -113,8 +113,8 @@ namespace KiriMeshSplitter
 				return;
 			}
 
-			string parent = Path.GetDirectoryName (path);
-			string dirname = Path.GetFileName (path);
+			var parent = Path.GetDirectoryName (path);
+			var dirname = Path.GetFileName (path);
 
 			if (!AssetDatabase.IsValidFolder (parent)) {
 				createFolder (parent);
@@ -125,8 +125,8 @@ namespace KiriMeshSplitter
 
 		private void splitSubmesh (SkinnedMeshRenderer mesh_renderer, int index, string submesh_dir)
 		{
-			string material_name = mesh_renderer.sharedMaterials [index].name;
-			string mesh_name = mesh_renderer.gameObject.name + "_" + material_name;
+			var material_name = mesh_renderer.sharedMaterials [index].name;
+			var mesh_name = mesh_renderer.gameObject.name + "_" + material_name;
 			var triangles = new int[][] { mesh_renderer.sharedMesh.GetTriangles (index) };
 
 			var new_mesh_renderer = createNewMesh (mesh_renderer, triangles, submesh_dir, mesh_name);
@@ -144,23 +144,23 @@ namespace KiriMeshSplitter
 			var mesh = mesh_renderer.sharedMesh;
 			var matrix = mesh_renderer.transform.localToWorldMatrix;
 
-			string mesh_name = mesh_renderer.gameObject.name;
-			string submesh_dir = getSubmeshPath (mesh_renderer);
+			var mesh_name = mesh_renderer.gameObject.name;
+			var submesh_dir = getSubmeshPath (mesh_renderer);
 			createFolder (submesh_dir);
 
 			var tri_a = new List<List<int>> ();
 			var tri_b = new List<List<int>> ();
 
-			for (int j = 0; j < mesh.subMeshCount; j++) {
+			for (var j = 0; j < mesh.subMeshCount; j++) {
 				var triangles = mesh.GetTriangles (j);
 				tri_a.Add (new List<int> ());
 				tri_b.Add (new List<int> ());
 
-				for (int i = 0; i < triangles.Length; i += 3) {
+				for (var i = 0; i < triangles.Length; i += 3) {
 					var triangle = triangles.Skip (i).Take (3);
-					bool side = false;
+					var side = false;
 
-					foreach (int n in triangle) {
+					foreach (var n in triangle) {
 						side = side || plane.GetSide (matrix.MultiplyPoint (mesh.vertices [n]));
 					}
 
@@ -195,7 +195,7 @@ namespace KiriMeshSplitter
 			var mesh = Instantiate (mesh_renderer.sharedMesh) as Mesh;
 
 			mesh.subMeshCount = triangles.Length; 
-			for (int i = 0; i < triangles.Length; i++) {
+			for (var i = 0; i < triangles.Length; i++) {
 				mesh.SetTriangles (triangles [i], i);
 			}
 			AssetDatabase.CreateAsset (mesh, Path.Combine (dirname, name + ".asset"));
