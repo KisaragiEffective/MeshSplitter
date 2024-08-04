@@ -154,26 +154,26 @@ namespace KiriMeshSplitter
 			// 取得するたびにいちいちコピーが走り、遅いのでローカル変数に突っ込んでそれを読む
 			var tris = mesh.vertices;
 
-			for (var j = 0; j < mesh.subMeshCount; j++) {
-				var triangles = mesh.GetTriangles (j);
+			for (var subMeshIndex = 0; subMeshIndex < mesh.subMeshCount; subMeshIndex++) {
+				var triangles = mesh.GetTriangles (subMeshIndex);
 				triA.Add (new List<int> ());
 				triB.Add (new List<int> ());
 
-				for (var i = 0; i < triangles.Length; i += 3) {
-					var triangle = triangles.Skip (i).Take (3).ToList();
+				for (var triangleIndex = 0; triangleIndex < triangles.Length; triangleIndex += 3) {
+					var triangle = triangles.Skip (triangleIndex).Take (3).ToList();
 					var side = triangle.Any(n => plane.GetSide(matrix.MultiplyPoint(tris[n])));
 
 					if (side) {
-						triA [j].AddRange (triangle);
+						triA [subMeshIndex].AddRange (triangle);
 					} else {
-						triB [j].AddRange (triangle);
+						triB [subMeshIndex].AddRange (triangle);
 					}
 
-					if (i % 30 == 0) {
+					if (triangleIndex % 30 == 0) {
 						EditorUtility.DisplayProgressBar (
 							"処理中", 
-							string.Format ("submesh:{0}/{1}, triangles:{2}/{3}", j, mesh.subMeshCount, i, triangles.Length),
-							(float)i / triangles.Length
+							string.Format ("submesh:{0}/{1}, triangles:{2}/{3}", subMeshIndex, mesh.subMeshCount, triangleIndex, triangles.Length),
+							(float)triangleIndex / triangles.Length
 						);
 					}
 				}
