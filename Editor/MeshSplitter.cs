@@ -127,7 +127,9 @@ namespace KiriMeshSplitter
 		{
 			var materialName = meshRenderer.sharedMaterials [index].name;
 			var meshName = meshRenderer.gameObject.name + "_" + materialName;
-			var triangles = new[] { meshRenderer.sharedMesh.GetTriangles (index) };
+			var tris = new List<int>();
+			meshRenderer.sharedMesh.GetTriangles(tris, index);
+			var triangles = new List<List<int>> { tris };
 
 			var newMeshRenderer = CreateNewMesh (meshRenderer, triangles, submeshDir, meshName);
 			newMeshRenderer.sharedMaterials = new[] { meshRenderer.sharedMaterials [index] };
@@ -179,22 +181,22 @@ namespace KiriMeshSplitter
 				}
 			}
 
-			CreateNewMesh (meshRenderer, triA.Select (n => n.ToArray ()).ToArray (), submeshDir, meshName + "_a");
-			CreateNewMesh (meshRenderer, triB.Select (n => n.ToArray ()).ToArray (), submeshDir, meshName + "_b");
+			CreateNewMesh (meshRenderer, triA, submeshDir, meshName + "_a");
+			CreateNewMesh (meshRenderer, triB, submeshDir, meshName + "_b");
 			meshRenderer.gameObject.SetActive (false);
 
 			EditorUtility.ClearProgressBar (); 
 		}
 
-		private static SkinnedMeshRenderer CreateNewMesh (SkinnedMeshRenderer original, int[][] triangles, string dirname, string name)
+		private static SkinnedMeshRenderer CreateNewMesh (SkinnedMeshRenderer original, List<List<int>> triangles, string dirname, string name)
 		{
 			var gameObject = CloneObject (original.gameObject);
 			gameObject.name = name;
 			var meshRenderer = gameObject.GetComponent<SkinnedMeshRenderer>();
 			var mesh = Instantiate (meshRenderer.sharedMesh);
 
-			mesh.subMeshCount = triangles.Length; 
-			for (var i = 0; i < triangles.Length; i++) {
+			mesh.subMeshCount = triangles.Count; 
+			for (var i = 0; i < triangles.Count; i++) {
 				mesh.SetTriangles (triangles [i], i);
 			}
 			AssetDatabase.CreateAsset (mesh, Path.Combine (dirname, name + ".asset"));
