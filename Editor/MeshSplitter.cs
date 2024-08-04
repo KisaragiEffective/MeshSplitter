@@ -4,48 +4,82 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using UnityEditor;
+using UnityEditor.UIElements;
+using UnityEngine.UIElements;
 
 namespace KiriMeshSplitter
 {
 	internal class MeshSplitterEditor : EditorWindow
 	{
-		private SkinnedMeshRenderer _mesh_renderer;
-		private MeshFilter _mesh_filter;
-
 		[MenuItem ("MeshSplitter/MeshSplitter Editor")]
 		private static void Create ()
 		{
 			GetWindow<MeshSplitterEditor> ("MeshSplitter");
 		}
 
-		private void OnGUI ()
+		private static StyleLength SimulatedVerticalEditorGUILayoutSpaceLength() => new StyleLength(12.0f);
+		private void CreateGUI()
 		{
-			EditorGUI.BeginChangeCheck ();
-			_mesh_renderer = EditorGUILayout.ObjectField ("Mesh", _mesh_renderer, typeof(SkinnedMeshRenderer), true) as SkinnedMeshRenderer;
-			EditorGUILayout.Space ();
-
-			_mesh_filter = EditorGUILayout.ObjectField ("Quad", _mesh_filter, typeof(MeshFilter), true) as MeshFilter;
-			EditorGUILayout.Space ();
-
-			if (EditorGUI.EndChangeCheck ()) {
-			}
-
-			if (_mesh_filter != null && _mesh_filter.sharedMesh.name != "Quad") {
-				_mesh_filter = null;
-			}
-
-			if (_mesh_renderer != null) {
-				if (GUILayout.Button ("split by materials")) {
-					SplitByMaterials (_mesh_renderer);
+			var targetMeshField = new ObjectField("Mesh")
+			{
+				objectType = typeof(SkinnedMeshRenderer), allowSceneObjects = true,
+				style =
+				{
+					marginBottom = SimulatedVerticalEditorGUILayoutSpaceLength()
 				}
-				EditorGUILayout.Space ();
-
-				if (_mesh_filter != null) {
-					if (GUILayout.Button ("split by quad")) {
-						splitByQuad (_mesh_renderer, _mesh_filter);
+			};
+			rootVisualElement.Add(targetMeshField);
+			
+			
+			var quad = new ObjectField("Quad")
+			{
+				objectType = typeof(MeshFilter), allowSceneObjects = true,
+				style =
+				{
+					marginBottom = SimulatedVerticalEditorGUILayoutSpaceLength()
+				}
+			};
+			rootVisualElement.Add(quad);
+			
+			var splitByMaterials = new Button(() => { SplitByMaterials(targetMeshField.value as SkinnedMeshRenderer); })
+				{
+					style =
+					{
+						marginBottom = SimulatedVerticalEditorGUILayoutSpaceLength()
 					}
+				};
+			rootVisualElement.Add(splitByMaterials);
+			splitByMaterials.Add(new Label("split by materials"));
+			splitByMaterials.style.display = targetMeshField.value != null ? DisplayStyle.Flex : DisplayStyle.None;
+			
+			var splitByQuad = new Button(() => { this.splitByQuad(targetMeshField.value as SkinnedMeshRenderer, quad.value as MeshFilter); })
+				{
+					style =
+					{
+						marginBottom = SimulatedVerticalEditorGUILayoutSpaceLength()
+					}
+				};
+			rootVisualElement.Add(splitByQuad);
+			splitByQuad.Add(new Label("split by quad"));
+			splitByQuad.style.display = quad.value != null ? DisplayStyle.Flex : DisplayStyle.None;
+			
+			targetMeshField.RegisterValueChangedCallback(ev =>
+			{
+				var visibleSplitByMaterial = ev.newValue != null;
+				splitByMaterials.style.display = visibleSplitByMaterial ? DisplayStyle.Flex : DisplayStyle.None;
+			});
+			quad.RegisterValueChangedCallback(ev =>
+			{
+				if (ev.newValue != null && (ev.newValue as MeshFilter)!.name != "Quad")
+				{
+					quad.value = null;
 				}
-			}
+			});
+			quad.RegisterValueChangedCallback(ev =>
+			{
+				var visibleSplitByQuad = ev.newValue != null;
+				splitByQuad.style.display = visibleSplitByQuad ? DisplayStyle.Flex : DisplayStyle.None;
+			});
 
 		}
 
