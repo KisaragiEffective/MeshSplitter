@@ -151,6 +151,9 @@ namespace KiriMeshSplitter
 			var triA = new List<List<int>> ();
 			var triB = new List<List<int>> ();
 
+			// 取得するたびにいちいちコピーが走り、遅いのでローカル変数に突っ込んでそれを読む
+			var tris = mesh.vertices;
+
 			for (var j = 0; j < mesh.subMeshCount; j++) {
 				var triangles = mesh.GetTriangles (j);
 				triA.Add (new List<int> ());
@@ -158,7 +161,7 @@ namespace KiriMeshSplitter
 
 				for (var i = 0; i < triangles.Length; i += 3) {
 					var triangle = triangles.Skip (i).Take (3).ToList();
-					var side = triangle.Any(n => plane.GetSide(matrix.MultiplyPoint(mesh.vertices[n])));
+					var side = triangle.Any(n => plane.GetSide(matrix.MultiplyPoint(tris[n])));
 
 					if (side) {
 						triA [j].AddRange (triangle);
