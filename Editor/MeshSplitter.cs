@@ -17,7 +17,7 @@ namespace KiriMeshSplitter
 			GetWindow<MeshSplitterEditor> ("MeshSplitter");
 		}
 
-		private StyleLength SimulatedVerticalEditorGUILayoutSpaceLength() => new StyleLength(12.0f);
+		private static StyleLength SimulatedVerticalEditorGUILayoutSpaceLength() => new StyleLength(12.0f);
 		private void CreateGUI()
 		{
 			var targetMeshField = new ObjectField("Mesh")
@@ -52,7 +52,7 @@ namespace KiriMeshSplitter
 			splitByMaterials.Add(new Label("split by materials"));
 			splitByMaterials.style.display = targetMeshField.value != null ? DisplayStyle.Flex : DisplayStyle.None;
 			
-			var splitByQuad = new Button(() => { this.SplitByQuad(targetMeshField.value as SkinnedMeshRenderer, quad.value as MeshFilter); })
+			var splitByQuad = new Button(() => { SplitByQuad(targetMeshField.value as SkinnedMeshRenderer, quad.value as MeshFilter); })
 				{
 					style =
 					{
@@ -83,7 +83,7 @@ namespace KiriMeshSplitter
 
 		}
 
-		private void SplitByMaterials (SkinnedMeshRenderer meshRenderer)
+		private static void SplitByMaterials (SkinnedMeshRenderer meshRenderer)
 		{
 			var submeshDir = GetSubmeshPath (meshRenderer);
 			CreateFolder (submeshDir);
@@ -95,7 +95,7 @@ namespace KiriMeshSplitter
 			meshRenderer.gameObject.SetActive (false);
 		}
 
-		private string GetSubmeshPath (SkinnedMeshRenderer meshRenderer)
+		private static string GetSubmeshPath (SkinnedMeshRenderer meshRenderer)
 		{
 			var meshPath = AssetDatabase.GetAssetPath (meshRenderer.sharedMesh);
 			var baseDir = Path.GetDirectoryName (meshPath);
@@ -107,7 +107,7 @@ namespace KiriMeshSplitter
 			}
 		}
 
-		private void CreateFolder (string path)
+		private static void CreateFolder (string path)
 		{
 			if (AssetDatabase.IsValidFolder (path)) {
 				return;
@@ -123,7 +123,7 @@ namespace KiriMeshSplitter
 			AssetDatabase.CreateFolder (parent, dirname);
 		}
 
-		private void SplitSubmesh (SkinnedMeshRenderer meshRenderer, int index, string submeshDir)
+		private static void SplitSubmesh (SkinnedMeshRenderer meshRenderer, int index, string submeshDir)
 		{
 			var materialName = meshRenderer.sharedMaterials [index].name;
 			var meshName = meshRenderer.gameObject.name + "_" + materialName;
@@ -133,12 +133,12 @@ namespace KiriMeshSplitter
 			newMeshRenderer.sharedMaterials = new Material[] { meshRenderer.sharedMaterials [index] };
 		}
 
-		private GameObject CloneObject (GameObject gameObject)
+		private static GameObject CloneObject (GameObject gameObject)
 		{
 			return Instantiate (gameObject, gameObject.transform.parent) as GameObject;
 		}
 
-		private void SplitByQuad (SkinnedMeshRenderer meshRenderer, MeshFilter meshFilter)
+		private static void SplitByQuad (SkinnedMeshRenderer meshRenderer, MeshFilter meshFilter)
 		{
 			var plane = CreatePlane (meshFilter);
 			var mesh = meshRenderer.sharedMesh;
@@ -187,7 +187,7 @@ namespace KiriMeshSplitter
 			EditorUtility.ClearProgressBar (); 
 		}
 
-		private SkinnedMeshRenderer CreateNewMesh (SkinnedMeshRenderer original, int[][] triangles, string dirname, string name)
+		private static SkinnedMeshRenderer CreateNewMesh (SkinnedMeshRenderer original, int[][] triangles, string dirname, string name)
 		{
 			var gameObject = CloneObject (original.gameObject);
 			gameObject.name = name;
@@ -204,7 +204,7 @@ namespace KiriMeshSplitter
 			return meshRenderer;
 		}
 
-		private Plane CreatePlane (MeshFilter meshFilter)
+		private static Plane CreatePlane (MeshFilter meshFilter)
 		{
 			var matrix = meshFilter.transform.localToWorldMatrix;
 			var mesh = meshFilter.sharedMesh;
