@@ -127,15 +127,15 @@ namespace KiriMeshSplitter
 		{
 			var materialName = meshRenderer.sharedMaterials [index].name;
 			var meshName = meshRenderer.gameObject.name + "_" + materialName;
-			var triangles = new int[][] { meshRenderer.sharedMesh.GetTriangles (index) };
+			var triangles = new[] { meshRenderer.sharedMesh.GetTriangles (index) };
 
 			var newMeshRenderer = CreateNewMesh (meshRenderer, triangles, submeshDir, meshName);
-			newMeshRenderer.sharedMaterials = new Material[] { meshRenderer.sharedMaterials [index] };
+			newMeshRenderer.sharedMaterials = new[] { meshRenderer.sharedMaterials [index] };
 		}
 
 		private static GameObject CloneObject (GameObject gameObject)
 		{
-			return Instantiate (gameObject, gameObject.transform.parent) as GameObject;
+			return Instantiate (gameObject, gameObject.transform.parent);
 		}
 
 		private static void SplitByQuad (SkinnedMeshRenderer meshRenderer, MeshFilter meshFilter)
@@ -191,8 +191,8 @@ namespace KiriMeshSplitter
 		{
 			var gameObject = CloneObject (original.gameObject);
 			gameObject.name = name;
-			var meshRenderer = gameObject.GetComponent (typeof(SkinnedMeshRenderer)) as SkinnedMeshRenderer;
-			var mesh = Instantiate (meshRenderer.sharedMesh) as Mesh;
+			var meshRenderer = gameObject.GetComponent<SkinnedMeshRenderer>();
+			var mesh = Instantiate (meshRenderer.sharedMesh);
 
 			mesh.subMeshCount = triangles.Length; 
 			for (var i = 0; i < triangles.Length; i++) {
