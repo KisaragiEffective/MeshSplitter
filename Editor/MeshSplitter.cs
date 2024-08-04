@@ -157,12 +157,8 @@ namespace KiriMeshSplitter
 				triB.Add (new List<int> ());
 
 				for (var i = 0; i < triangles.Length; i += 3) {
-					var triangle = triangles.Skip (i).Take (3);
-					var side = false;
-
-					foreach (var n in triangle) {
-						side = side || plane.GetSide (matrix.MultiplyPoint (mesh.vertices [n]));
-					}
+					var triangle = triangles.Skip (i).Take (3).ToList();
+					var side = triangle.Any(n => plane.GetSide(matrix.MultiplyPoint(mesh.vertices[n])));
 
 					if (side) {
 						triA [j].AddRange (triangle);
