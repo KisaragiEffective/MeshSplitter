@@ -5,10 +5,10 @@ using UnityEngine.UIElements;
 
 namespace KiriMeshSplitter
 {
-	internal class MeshSplitterEditor : EditorWindow
+	public class MeshSplitterEditor : EditorWindow
 	{
 		[MenuItem ("MeshSplitter/MeshSplitter Editor")]
-		private void Create ()
+		private static void OnOpen()
 		{
 			GetWindow<MeshSplitterEditor> ("MeshSplitter");
 		}
