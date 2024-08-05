@@ -37,6 +37,12 @@ namespace KiriMeshSplitter
 			};
 			rootVisualElement.Add(quad);
 			var quadFieldProxy = new TypeSafeObjectField<MeshFilter>(quad);
+
+			// TODO: group them by Foldout
+			// TODO: add bone weight threshold field (0.0f to 1.0f)
+			var splitBoneByWeightField = new ObjectField("transform") { objectType = typeof(Transform) };
+			rootVisualElement.Add(splitBoneByWeightField);
+			var splitBoneByWeightFieldProxy = new TypeSafeObjectField<Transform>(splitBoneByWeightField);
 			
 			var splitByMaterials = new Button(() => { BusinessLogic.SplitByMaterials(targetMeshFieldProxy.Value); })
 				{
@@ -62,6 +68,13 @@ namespace KiriMeshSplitter
 			rootVisualElement.Add(splitByQuad);
 			splitByQuad.Add(new Label("split by quad"));
 			splitByQuad.style.display = quadFieldProxy.Value != null ? DisplayStyle.Flex : DisplayStyle.None;
+
+			var button = new Button(() =>
+			{
+				BusinessLogic.SplitByBoneWeight(targetMeshFieldProxy.Value, splitBoneByWeightFieldProxy.Value);
+			});
+			rootVisualElement.Add(button);
+			button.Add(new Label("split by bone weight"));
 			
 			targetMeshFieldProxy.ObjectField.RegisterValueChangedCallback(ev =>
 			{
